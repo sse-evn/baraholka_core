@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class News extends Model
 {
-    /** @use HasFactory<\Database\Factories\NewsFactory> */
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'title',
+        'content',
+        'image_url',
+        'is_published',
+    ];
 }
