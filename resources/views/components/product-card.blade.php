@@ -13,9 +13,9 @@
     @endauth
 
     {{-- Изображение --}}
-    <img src="{{ $product->image ? asset('storage/'.$product->image) : 'https://via.placeholder.com/300x200' }}"
-         class="card-img-top"
-         style="height:180px; object-fit:cover">
+<img src="{{ $product->image ? asset('storage/'.$product->image) : 'https://randomuser.me/api/portraits/lego/1.jpg' }}"
+     class="card-img-top"
+     style="height:180px; object-fit:cover">
 
     {{-- Содержание --}}
     <div class="card-body d-flex flex-column">

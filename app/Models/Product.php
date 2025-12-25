@@ -24,6 +24,15 @@ class Product extends Model
     {
         return $this->belongsTo(Seller::class);
     }
+    public function favorites()
+    {
+        return $this->belongsToMany(Product::class, 'favorites');
+    }
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
 
     public function category()
     {
