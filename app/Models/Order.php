@@ -15,7 +15,6 @@ class Order extends Model
         'status',
     ];
 
-    // 👇 Обязательно должны быть эти методы:
     public function user()
     {
         return $this->belongsTo(User::class);

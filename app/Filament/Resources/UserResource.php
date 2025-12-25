@@ -44,17 +44,19 @@ class UserResource extends Resource
                     ])
                     ->required(),
 
-                Forms\Components\TextInput::make('password')
-                    ->label('Пароль')
-                    ->password()
-                    ->dehydrated(fn($state) => filled($state))
-                    ->required(fn($operation) => $operation === 'create')
-                    ->confirmed(),
+               Forms\Components\TextInput::make('password')
+    ->label('Пароль')
+    ->password()
+    ->required(fn ($operation) => $operation === 'create')
+    ->dehydrated(fn ($state) => filled($state))
+    ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
+    ->confirmed(),
 
-                Forms\Components\TextInput::make('password_confirmation')
-                    ->label('Подтверждение пароля')
-                    ->password()
-                    ->dehydrated(false),
+Forms\Components\TextInput::make('password_confirmation')
+    ->label('Подтверждение пароля')
+    ->password()
+    ->dehydrated(false)
+    ->required(fn ($operation) => $operation === 'create'),
             ]);
     }
 

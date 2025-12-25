@@ -17,8 +17,6 @@ class Category extends Model
 
         static::updating(function ($category) {
             if ($category->isDirty('name')) {
-                // Обновляем slug только если он не был явно задан пользователем
-                // (т.е. если slug не изменился вручную в этом запросе)
                 if (!$category->isDirty('slug')) {
                     $category->slug = Str::slug($category->name);
                 }
