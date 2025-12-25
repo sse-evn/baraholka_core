@@ -45,7 +45,6 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        // Удаляем старые токены (опционально)
         $user->tokens()->delete();
 
         $token = $user->createToken('mobile-app')->plainTextToken;

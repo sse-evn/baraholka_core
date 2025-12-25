@@ -10,15 +10,27 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = \App\Models\Order::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $navigationGroup = 'Заказы';
     protected static ?int $navigationSort = 3;
+
+    public static function getEloquentQuery(): Builder
+    {
+    $query = parent::getEloquentQuery();
+
+    $user = Auth::user();
+    
+    if ($user && $user->role !== 'admin') {
+        $query->where('user_id', $user->id);
+    }
+
+    return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -30,7 +42,6 @@ class OrderResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required(),
-
 
                 Forms\Components\TextInput::make('total')
                     ->label('Итого')
@@ -83,9 +94,6 @@ class OrderResource extends Resource
                     ->label('Дата')
                     ->dateTime()
                     ->sortable(),
-            ])
-            ->filters([
-                //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

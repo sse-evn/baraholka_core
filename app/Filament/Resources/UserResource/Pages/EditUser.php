@@ -16,4 +16,36 @@ class EditUser extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        if ($this->record->role === 'seller' && $this->record->seller) {
+            $data['shop_name'] = $this->record->seller->shop_name;
+            $data['contact_email'] = $this->record->seller->contact_email;
+            $data['phone'] = $this->record->seller->phone;
+        }
+
+        return $data;
+    }
+
+protected function handleRecordSaved(): void
+{
+    parent::handleRecordSaved();
+
+    $data = $this->form->getState();
+
+    if ($data['role'] === 'seller') {
+        \App\Models\Seller::updateOrCreate(
+            ['user_id' => $this->record->id],
+            [
+                'shop_name' => $data['shop_name'] ?? '',
+                'contact_email' => $data['contact_email'] ?? '',
+                'phone' => $data['phone'] ?? '',
+            ]
+        );
+    } else {
+        $this->record->seller?->delete();
+    }
+}
+
 }

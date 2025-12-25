@@ -10,15 +10,33 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
     protected static ?string $navigationGroup = 'Товары';
     protected static ?int $navigationSort = 1;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->guard()->user();
+        return $user && in_array($user->role, ['admin', 'seller']);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->guard()->user();
+        if ($user && $user->role === 'seller') {
+            $query->whereHas('seller', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -61,7 +79,27 @@ class ProductResource extends Resource
                     ->relationship('seller', 'shop_name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('shop_name')
+                            ->label('Название магазина')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('contact_email')
+                            ->label('Email контакта')
+                            ->email()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Телефон')
+                            ->tel(),
+                    ])
+                    ->createOptionUsing(function (array $data) {
+                        $seller = \App\Models\Seller::create($data);
+                        return $seller->id;
+                    })
+                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('seller_id', $state)),
 
                 Forms\Components\Toggle::make('is_active')
                     ->label('Активен')
@@ -87,7 +125,7 @@ class ProductResource extends Resource
 
                 Tables\Columns\TextColumn::make('price')
                     ->label('Цена')
-                    ->money('RUB')
+                    ->money('KZT')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('stock')
@@ -97,9 +135,6 @@ class ProductResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Активен')
                     ->boolean(),
-            ])
-            ->filters([
-                //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -112,6 +147,7 @@ class ProductResource extends Resource
                 ]),
             ]);
     }
+
     public static function getModel(): string
     {
         return Product::class;
@@ -124,9 +160,7 @@ class ProductResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

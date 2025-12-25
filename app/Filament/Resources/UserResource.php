@@ -4,13 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Models\Seller;
 use Filament\Resources\Resource;
 use Filament\Forms;
-use Filament\Tables;
 use Filament\Forms\Form;
+use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
@@ -19,6 +19,11 @@ class UserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Пользователи';
     protected static ?int $navigationSort = 2;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
 
     public static function form(Form $form): Form
     {
@@ -42,21 +47,37 @@ class UserResource extends Resource
                         'seller' => 'Продавец',
                         'admin' => 'Админ',
                     ])
-                    ->required(),
+                    ->required()
+                    ->reactive(),
 
-               Forms\Components\TextInput::make('password')
-    ->label('Пароль')
-    ->password()
-    ->required(fn ($operation) => $operation === 'create')
-    ->dehydrated(fn ($state) => filled($state))
-    ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
-    ->confirmed(),
+                // Поля магазина для продавцов
+                Forms\Components\TextInput::make('shop_name')
+                    ->label('Название магазина')
+                    ->maxLength(255)
+                    ->visible(fn ($get) => $get('role') === 'seller'),
 
-Forms\Components\TextInput::make('password_confirmation')
-    ->label('Подтверждение пароля')
-    ->password()
-    ->dehydrated(false)
-    ->required(fn ($operation) => $operation === 'create'),
+                Forms\Components\TextInput::make('contact_email')
+                    ->label('Email магазина')
+                    ->email()
+                    ->visible(fn ($get) => $get('role') === 'seller'),
+
+                Forms\Components\TextInput::make('phone')
+                    ->label('Телефон магазина')
+                    ->visible(fn ($get) => $get('role') === 'seller'),
+
+                Forms\Components\TextInput::make('password')
+                    ->label('Пароль')
+                    ->password()
+                    ->required(fn ($operation) => $operation === 'create')
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
+                    ->confirmed(),
+
+                Forms\Components\TextInput::make('password_confirmation')
+                    ->label('Подтверждение пароля')
+                    ->password()
+                    ->dehydrated(false)
+                    ->required(fn ($operation) => $operation === 'create'),
             ]);
     }
 
@@ -64,14 +85,8 @@ Forms\Components\TextInput::make('password_confirmation')
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Имя')
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
-
+                Tables\Columns\TextColumn::make('name')->label('Имя')->searchable(),
+                Tables\Columns\TextColumn::make('email')->label('Email')->searchable(),
                 Tables\Columns\TextColumn::make('role')
                     ->label('Роль')
                     ->badge()
@@ -81,25 +96,15 @@ Forms\Components\TextInput::make('password_confirmation')
                         'customer' => 'gray',
                     })
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Дата регистрации')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('created_at')->label('Дата регистрации')->dateTime()->sortable(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->authorize(fn() => Auth::user()?->role === 'admin'),
+                Tables\Actions\DeleteAction::make()->authorize(fn() => Auth::user()?->role === 'admin'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make()->authorize(fn() => Auth::user()?->role === 'admin'),
             ]);
     }
 

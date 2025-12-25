@@ -21,7 +21,6 @@ class OrderController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
-        // Рассчитываем total
         $total = 0;
         $itemsData = [];
         foreach ($request->items as $item) {
@@ -35,14 +34,12 @@ class OrderController extends Controller
             ];
         }
 
-        // Создаём заказ
         $order = Order::create([
             'user_id' => $request->user_id,
             'total' => $total,
             'status' => 'pending',
         ]);
 
-        // Создаём позиции
         foreach ($itemsData as $data) {
             $order->items()->create($data);
         }

@@ -12,5 +12,7 @@ class Seller extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+        
     }
+    protected $fillable = ['user_id','shop_name', 'contact_email', 'phone'];
 }
