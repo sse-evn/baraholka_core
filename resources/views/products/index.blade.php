@@ -1,37 +1,40 @@
 @extends('layouts.app')
 
 @section('content')
-<h1>Все товары</h1>
+<h1 class="mb-4">Все товары</h1>
 
-@if($products->isEmpty())
-    <p class="text-muted">Пока нет ни одного товара.</p>
-@else
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        @foreach($products as $product)
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 180px; object-fit: cover;">
-                    @else
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                            <span class="text-muted">Нет фото</span>
-                        </div>
-                    @endif
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 30) }}</h5>
-                        <p class="text-muted small">{{ $product->category?->name }}</p>
-                        <div class="mt-auto">
-                            <p class="h5 mb-2">{{ number_format($product->price, 0, ',', ' ') }} ₸</p>
-                            <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary w-100">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endforeach
+<form class="card card-body mb-4">
+    <div class="row g-2">
+        <div class="col-md-5">
+            <input name="q" value="{{ request('q') }}"
+                   class="form-control"
+                   placeholder="Поиск товара">
+        </div>
+        <div class="col-md-3">
+            <input name="min_price" type="number"
+                   placeholder="Цена от"
+                   class="form-control">
+        </div>
+        <div class="col-md-3">
+            <input name="max_price" type="number"
+                   placeholder="Цена до"
+                   class="form-control">
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary w-100">OK</button>
+        </div>
     </div>
+</form>
 
-    <div class="mt-4">
-        {{ $products->links() }}
+<div class="row g-4">
+@foreach($products as $product)
+    <div class="col-6 col-md-4 col-lg-3">
+        @include('components.product-card', ['product'=>$product])
     </div>
-@endif
+@endforeach
+</div>
+
+<div class="mt-4">
+    {{ $products->links() }}
+</div>
 @endsection

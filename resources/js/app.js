@@ -35,5 +35,27 @@ app.component('example-component', ExampleComponent);
  * an "id" attribute of "app". This element is included with the "auth"
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const productId = this.dataset.id;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch(`/favorites/${productId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.innerText = data.added ? '❤️' : '🤍';
+            })
+            .catch(err => console.error(err));
+        });
+    });
+});
 
 app.mount('#app');
