@@ -46,4 +46,14 @@ class OrderController extends Controller
 
         return response()->json($order->load('items.product'), 201);
     }
+    public function setPickupPoint(Request $request, Order $order)
+{
+    $request->validate([
+        'pickup_point_id' => ['required', 'exists:pickup_points,id'],
+    ]);
+
+    $order->update(['pickup_point_id' => $request->pickup_point_id]);
+
+    return back()->with('success', 'Пункт выдачи успешно выбран!');
+}
 }

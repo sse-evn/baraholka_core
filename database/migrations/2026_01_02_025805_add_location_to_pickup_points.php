@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::table('pickup_points', function (Blueprint $table) {
             $table->json('location')->nullable();
         });
+        
     }
 
     public function down(): void

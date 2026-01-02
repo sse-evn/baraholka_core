@@ -20,4 +20,8 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    public function pickupPoint()
+{
+    return $this->belongsTo(PickupPoint::class, 'pickup_point_id');
+}
 }

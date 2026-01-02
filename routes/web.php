@@ -41,24 +41,24 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Регион
 Route::post('/set-region', [RegionController::class, 'set'])->name('region.set');
 
-// Избранное
-Route::middleware('auth')->group(function () {
-        Route::post('/favorites/{product}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
-});
-
-// Корзина — доступна всем для добавления, просмотр только авторизованным
+// Корзина 
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::middleware('auth')->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.remove');
-});
 
 // Оформление
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+ Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
+    ->name('checkout.success');
+         Route::post('/favorites/{product}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.remove');
 
 });
+
