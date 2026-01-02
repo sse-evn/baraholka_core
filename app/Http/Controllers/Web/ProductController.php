@@ -19,7 +19,7 @@ public function index(Request $request): View
         ->when($request->max_price, fn ($q) => $q->where('price', '<=', $request->max_price))
         ->where('is_active', true)
         ->latest()
-        ->paginate(12)
+        ->paginate(15)
         ->withQueryString();
 
     // Только 1 последняя новость для всплывающей ленты

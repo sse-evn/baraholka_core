@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\PickupPoint;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,9 @@ class CheckoutController extends Controller
 
     public function success(): View
     {
-        return view('checkout.success');
+    $pickupPoints = PickupPoint::where('is_active', true)->get();
+
+    return view('checkout.success', compact('pickupPoints'));
+
     }
 }

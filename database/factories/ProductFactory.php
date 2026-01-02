@@ -50,15 +50,14 @@ class ProductFactory extends Factory
             'Проверено временем — работает без нареканий.',
         ];
 
-        return [
-            'name' => $this->faker->randomElement($names) . ' ' . $this->faker->word,
-            'description' => $this->faker->randomElement($descriptions) . ' ' . $this->faker->sentence,
-            'price' => $this->faker->numberBetween(500, 200000),
-            'stock' => $this->faker->numberBetween(0, 50),
-            'image' => null,
-            'category_id' => Category::inRandomOrder()->first()->id,
-            'seller_id' => Seller::inRandomOrder()->first()->id,
-            'is_active' => $this->faker->boolean(70), 
-        ];
-    }
+return [
+    'name' => $this->faker->randomElement($names) . ' ' . $this->faker->word,
+    'description' => $this->faker->randomElement($descriptions) . ' ' . $this->faker->sentence,
+    'price' => $this->faker->numberBetween(500, 200000),
+    'stock' => $this->faker->numberBetween(0, 50),
+    'image_url' => null, 
+    'category_id' => Category::inRandomOrder()->first()->id,
+    'seller_id' => Seller::inRandomOrder()->first()->id,
+    'is_active' => $this->faker->boolean(70),
+];    }
 }
