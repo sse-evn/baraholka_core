@@ -16,10 +16,10 @@
         </a>
     @endauth
 
-    <img src="{{ $product->image_url ? asset('storage/'.$product->image_url) : 'https://randomuser.me/api/portraits/lego/1.jpg' }}"
-         class="card-img-top"
-         style="height:160px; object-fit:cover;">
-
+<img src="{{ $product->image_url ?? 'https://via.placeholder.com/300?text=Нет+фото' }}"
+     class="card-img-top"
+     style="height:160px; object-fit:cover;">
+     
     <div class="card-body d-flex flex-column p-3">
         <h6 class="mb-1 fw-bold">{{ \Str::limit($product->name, 35) }}</h6>
         <span class="text-muted small mb-2">{{ $product->category?->name }}</span>

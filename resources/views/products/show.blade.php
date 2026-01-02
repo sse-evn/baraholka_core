@@ -13,9 +13,10 @@
             <!-- Миниатюры -->
             <div class="d-flex gap-2">
                 @for($i = 1; $i <= 3; $i++)
-                    <img src="https://via.placeholder.com/80?text=Фото+{{ $i }}"
-                         class="rounded" style="width:80px; height:80px; object-fit:cover; cursor:pointer;"
-                         onclick="document.querySelector('#main-img').src=this.src">
+                 <img id="main-img" src="{{ $product->image_url ?? 'https://via.placeholder.com/400?text=Нет+фото' }}"
+     class="img-fluid rounded mb-3"
+     alt="{{ $product->name }}"
+     style="object-fit: cover; height: 400px; width: 100%;">
                 @endfor
             </div>
         </div>
@@ -57,33 +58,33 @@
                 </div>
             @endif
 
-<!-- Кнопки -->
-<div class="d-flex gap-2 mb-4">
-    <form action="{{ route('cart.add') }}" method="POST">
-        @csrf
-        <input type="hidden" name="product_id" value="{{ $product->id }}">
-        <button type="submit" class="btn btn-primary px-4">В корзину</button>
-    </form>
+            <!-- Кнопки -->
+            <div class="d-flex gap-2 mb-4">
+                <form action="{{ route('cart.add') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <button type="submit" class="btn btn-primary px-4">В корзину</button>
+                </form>
 
-    @auth
-        <form action="{{ route('favorites.toggle', $product) }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-outline-danger">
-                @if(auth()->user()->favorites->contains($product->id))
-                    Удалить из избранного ❤️
+                @auth
+                    <form action="{{ route('favorites.toggle', $product) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger">
+                            @if(auth()->user()->favorites->contains($product->id))
+                                Удалить из избранного ❤️
+                            @else
+                                В избранное 🤍
+                            @endif
+                        </button>
+                    </form>
                 @else
-                    В избранное 🤍
-                @endif
-            </button>
-        </form>
-    @else
-        <a href="{{ route('login') }}" class="btn btn-outline-danger">В избранное 🤍</a>
-    @endauth
+                    <a href="{{ route('login') }}" class="btn btn-outline-danger">В избранное 🤍</a>
+                @endauth
 
-    <button class="btn btn-outline-secondary" onclick="shareProduct()">
-        <i class="bi bi-share"></i>
-    </button>
-</div>
+                <button class="btn btn-outline-secondary" onclick="shareProduct()">
+                    <i class="bi bi-share"></i>
+                </button>
+            </div>
 
             <a href="{{ route('home') }}" class="btn btn-secondary">← Назад к товарам</a>
         </div>
