@@ -14,29 +14,42 @@ class Product extends Model
         'description',
         'price',
         'stock',
-        'image',
+        'image_url',
         'category_id',
         'seller_id',
-        'active',
+        'is_active',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'price' => 'decimal:2',
+    ];
+
+    protected function imageUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn ($value) => $value ? asset('storage/' . $value) : null,
+        );
+    }
 
     public function seller()
     {
         return $this->belongsTo(Seller::class);
     }
-    public function favorites()
-    {
-        return $this->belongsToMany(Product::class, 'favorites');
-    }
-    public function shop()
-    {
-        return $this->belongsTo(Shop::class);
-    }
-
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-    
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating') ?: 0;
+    }
+
 }
